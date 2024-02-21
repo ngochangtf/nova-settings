@@ -104,7 +104,7 @@ class SettingsController extends Controller
                     $setting->value = $tempResource->{$field->attribute};
 
                     $history = [
-                        'is_create' => $setting->exists,
+                        'is_create' => !$setting->exists,
                         'attribute' => $setting->getAttribute('key'),
                         'before' => $setting->getOriginal('value'),
                         'after' => $setting->getAttribute('value'),
@@ -146,7 +146,7 @@ class SettingsController extends Controller
 
                 $existingRow->value = null;
                 $history            = [
-                    'is_create' => $existingRow->exists,
+                    'is_create' => !$existingRow->exists,
                     'attribute' => $existingRow->getAttribute('key'),
                     'before' => $existingRow->getOriginal('value'),
                     'after' => $existingRow->getAttribute('value'),
