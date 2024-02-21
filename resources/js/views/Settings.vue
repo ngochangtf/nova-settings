@@ -38,6 +38,13 @@
         </div>
       </div>
     </div>
+
+    <ResourceIndex
+      :resource-name="'activities'"
+      :load-cards="false"
+      :initialPerPage="5"
+      :should-override-meta="false"
+    />
   </LoadingView>
 </template>
 
@@ -53,6 +60,7 @@ export default {
       fields: [],
       panels: [],
       authorizations: [],
+      withResourceActivities: null,
       validationErrors: new Errors(),
     };
   },
@@ -70,7 +78,7 @@ export default {
       if (this.pageId) params.path = this.pageId;
 
       const {
-        data: { fields, panels, authorizations },
+        data: { fields, panels, authorizations, withResourceActivities },
       } = await Nova.request()
         .get('/nova-vendor/nova-settings/settings', { params })
         .catch(error => {
@@ -82,6 +90,7 @@ export default {
       this.fields = fields;
       this.panels = panels;
       this.authorizations = authorizations;
+      this.withResourceActivities = withResourceActivities;
       this.loading = false;
 
       // Dispatch event
