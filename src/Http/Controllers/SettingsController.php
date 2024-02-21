@@ -78,10 +78,7 @@ class SettingsController extends Controller
 
         Validator::make($request->all(), $rules)->validate();
 
-        $this->processWithEvents($request, $fields, function (
-            NovaRequest     $request,
-            FieldCollection $fields,
-        ) use ($path) {
+        $this->processWithEvents($request, function (NovaRequest $request) use ($fields, $path) {
             $changes = collect();
 
             $fields->whereInstanceOf(Resolvable::class)
@@ -107,7 +104,7 @@ class SettingsController extends Controller
                     $setting->value = $tempResource->{$field->attribute};
 
                     $history = [
-                        'is_create' => $setting->wasRecentlyCreated,
+                        'is_create' => $setting->exists,
                         'attribute' => $setting->getAttribute('key'),
                         'before' => $setting->getOriginal('value'),
                         'after' => $setting->getAttribute('value'),
@@ -134,16 +131,36 @@ class SettingsController extends Controller
 
         $existingRow = NovaSettings::getSettingsModel()::where('key', $fieldName)->first();
         if (isset($existingRow)) {
-            $field = $this->findField(collect(NovaSettings::getFields($pathName)), $fieldName);
+            $this->processWithEvents($request, function () use ($existingRow, $pathName) {
+                $changes = collect();
+                $field   = $this->findField(
+                    collect(NovaSettings::getFields($pathName)),
+                    $existingRow->getAttribute('key'),
+                );
 
-            // Delete file if exists
-            if (isset($field) && $field instanceof \Laravel\Nova\Fields\File) {
-                $disk = $field->getStorageDisk();
-                Storage::disk($disk)->delete($existingRow->value);
-            }
+                // Delete file if exists
+                if (isset($field) && $field instanceof \Laravel\Nova\Fields\File) {
+                    $disk = $field->getStorageDisk();
+                    Storage::disk($disk)->delete($existingRow->value);
+                }
 
-            $existingRow->value = null;
-            $existingRow->save();
+                $existingRow->value = null;
+                $history            = [
+                    'is_create' => $existingRow->exists,
+                    'attribute' => $existingRow->getAttribute('key'),
+                    'before' => $existingRow->getOriginal('value'),
+                    'after' => $existingRow->getAttribute('value'),
+                ];
+
+                if ($existingRow->isDirty('value') && $existingRow->save()) {
+                    $changes->add($history);
+                }
+
+                return [
+                    'path' => $pathName,
+                    'changes' => $changes,
+                ];
+            });
         }
 
         return response('', 204);
