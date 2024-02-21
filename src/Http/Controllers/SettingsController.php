@@ -106,16 +106,15 @@ class SettingsController extends Controller
                     $setting = $settingsClass::firstOrNew(['key' => $field->attribute]);
                     $setting->value = $tempResource->{$field->attribute};
 
-                    if (
-                        $setting->isDirty('value')
-                        && $setting->save()
-                    ) {
-                        $changes->add([
-                            'is_create' => $setting->wasRecentlyCreated,
-                            'attribute' => $setting->key,
-                            'before' => $setting->getRawOriginal('value'),
-                            'after' => $setting->value,
-                        ]);
+                    $history = [
+                        'is_create' => $setting->wasRecentlyCreated,
+                        'attribute' => $setting->getAttribute('key'),
+                        'before' => $setting->getOriginal('value'),
+                        'after' => $setting->getAttribute('value'),
+                    ];
+
+                    if ($setting->isDirty('value') && $setting->save()) {
+                        $changes->add($history);
                     }
                 });
 
