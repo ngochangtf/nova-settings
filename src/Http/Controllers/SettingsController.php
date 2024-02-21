@@ -59,8 +59,8 @@ class SettingsController extends Controller
     {
         if (!NovaSettings::getAuthorizations('authorizedToUpdate')) return $this->unauthorized();
 
-        $path = $request->get('path', 'general');
-        $fields = $this->availableFields($path);
+        $pathName = $request->get('path', 'general');
+        $fields   = $this->availableFields($pathName);
 
         // NovaDependencyContainer support
         $fields = $fields->map(function ($field) {
@@ -78,7 +78,7 @@ class SettingsController extends Controller
 
         Validator::make($request->all(), $rules)->validate();
 
-        $this->processWithEvents($request, function (NovaRequest $request) use ($fields, $path) {
+        $this->processWithEvents($request, function (NovaRequest $request) use ($fields, $pathName) {
             $changes = collect();
 
             $fields->whereInstanceOf(Resolvable::class)
@@ -115,7 +115,7 @@ class SettingsController extends Controller
                     }
                 });
 
-            return compact('path', 'changes');
+            return compact('pathName', 'changes');
         });
 
         if (config('nova-settings.reload_page_on_save', false) === true) {
@@ -156,10 +156,7 @@ class SettingsController extends Controller
                     $changes->add($history);
                 }
 
-                return [
-                    'path' => $pathName,
-                    'changes' => $changes,
-                ];
+                return compact('pathName', 'changes');
             });
         }
 
