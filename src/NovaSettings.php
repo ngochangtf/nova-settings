@@ -17,6 +17,8 @@ class NovaSettings extends Tool
 
     public static ?Closure $afterUpdated = null;
 
+    public static ?string $resourceActivities = null;
+
     public function boot()
     {
         Nova::script('nova-settings', __DIR__ . '/../dist/js/entry.js');
@@ -158,5 +160,10 @@ class NovaSettings extends Tool
     public static function withUpdatedCallback(Closure $callback): void
     {
         NovaSettings::$afterUpdated = $callback;
+    }
+
+    public static function withResourceActivities(string $resource): void
+    {
+        NovaSettings::$resourceActivities = $resource;
     }
 }

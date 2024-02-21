@@ -52,7 +52,8 @@ class SettingsController extends Controller
             'panels' => $panels,
             'fields' => $fields,
             'authorizations' => NovaSettings::getAuthorizations(),
-        ], 200);
+            'withResourceActivities' => NovaSettings::$resourceActivities,
+        ]);
     }
 
     public function save(NovaRequest $request)
