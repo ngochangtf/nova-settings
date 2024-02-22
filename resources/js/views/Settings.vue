@@ -44,7 +44,6 @@
       :resource-name="withResourceActivities"
       :should-override-meta="false"
       :load-cards="false"
-      :filters="{pageId}"
     />
   </LoadingView>
 </template>
