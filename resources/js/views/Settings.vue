@@ -40,10 +40,15 @@
     </div>
 
     <ResourceIndex
-      :resource-name="'activities'"
-      :load-cards="false"
-      :initialPerPage="5"
+      v-if="withResourceActivities"
+      :resource-name="withResourceActivities"
       :should-override-meta="false"
+      :load-cards="false"
+
+      :via-resource="'settings'"
+      :via-resource-id="pageId"
+      :via-relationship="'activities'"
+      :relationship-type="'hasMany'"
     />
   </LoadingView>
 </template>
