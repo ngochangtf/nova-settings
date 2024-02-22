@@ -44,11 +44,7 @@
       :resource-name="withResourceActivities"
       :should-override-meta="false"
       :load-cards="false"
-
-      :via-resource="'settings'"
-      :via-resource-id="pageId"
-      :via-relationship="'activities'"
-      :relationship-type="'hasMany'"
+      :filters="{pageId}"
     />
   </LoadingView>
 </template>
